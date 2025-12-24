@@ -4,13 +4,27 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function LoginPage() {
+interface LoginPageProps {
+  onLoginSuccess: () => void;
+}
+
+export default function LoginPage({onLoginSuccess}: LoginPageProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    alert(`로그인 시도: ${email}`);
+    //alert(`로그인 시도: ${email}`);
+    // Temporary id/password
+    const adminUser = {email: "test@test.com", password:"1111"};
+
+    if (email == adminUser.email && password == adminUser.password) {
+      alert("로그인 성공");
+      // 여기에서 메인 대시보드로 이동하는 로직 추가
+      onLoginSuccess();
+    } else {
+      alert("이메일 또는 비밀번호가 틀렸습니다.")
+    }
   };
 
   return (
