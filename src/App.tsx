@@ -2,19 +2,24 @@ import { useState } from "react";
 import './App.css'
 import LoginPage from "@/pages/LoginPage";
 import DashboardPage from "@/pages/DashboardPage";
+import DividendInputPage from "@/pages/DividendInputPage";
 
 function App() {
   // 로그인 여부를 관리하는 상태
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // Current View
+  const [currentView, setCurrentView] = useState("list");
   
+  if (!isLoggedIn) {
+    return <LoginPage onLoginSuccess={() => setIsLoggedIn(true)} />;
+  }
+
   return (
     <div className="App">
-      {isLoggedIn ? (
-        // 로그인 성공 시 대시보드 표시
-        <DashboardPage />
+      {currentView === "list" ? (
+        <DashboardPage onAddClick={() => setCurrentView("input")} />
       ) : (
-        // 로그인 전에는 로그인 페이지 표시 (성공 시 상태 변경 함수 전달)
-        <LoginPage onLoginSuccess={() => setIsLoggedIn(true)} />
+        <DividendInputPage onBack={() => setCurrentView("list")} />
       )}
     </div>
   );

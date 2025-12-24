@@ -1,5 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const myStocks = [
@@ -8,12 +10,20 @@ const myStocks = [
   { name: "리얼티인컴", ticker: "O", amount: 20, dividend: "5.8%", status: "배당예정" },
 ];
 
-export default function DashboardPage() {
+interface DashboardProps {
+  onAddClick: () => void;
+}
+
+export default function DashboardPage({ onAddClick }: DashboardProps) {
   return (
     <div className="p-8 bg-slate-50 min-h-screen">
       <div className="max-w-5xl mx-auto space-y-6">
         <h1 className="text-3xl font-bold text-slate-900">내 배당금 대시보드</h1>
-        
+        {/* 배당금 입력 화면으로 이동하는 버튼 */}
+          <Button onClick={onAddClick} className="flex gap-2">
+            <PlusCircle size={18} />
+            배당금 입력
+          </Button>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card><CardHeader><CardTitle className="text-sm">총 자산</CardTitle></CardHeader>
             <CardContent><p className="text-2xl font-bold">₩12,450,000</p></CardContent>
