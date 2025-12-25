@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { type StockData } from "@/types/stock";
 
 const myStocks = [
   { name: "삼성전자", ticker: "005930", amount: 10, dividend: "3.5%", status: "배당완료" },
@@ -11,10 +12,11 @@ const myStocks = [
 ];
 
 interface DashboardProps {
+  stocks: StockData[];
   onAddClick: () => void;
 }
 
-export default function DashboardPage({ onAddClick }: DashboardProps) {
+export default function DashboardPage({ stocks, onAddClick }: DashboardProps) {
   return (
     <div className="p-8 bg-slate-50 min-h-screen">
       <div className="max-w-5xl mx-auto space-y-6">
@@ -67,6 +69,32 @@ export default function DashboardPage({ onAddClick }: DashboardProps) {
             </Table>
           </CardContent>
         </Card>
+
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>종목명</TableHead>
+              <TableHead>티커</TableHead>
+              <TableHead>수량</TableHead>
+              <TableHead>배당률</TableHead>
+              <TableHead>상태</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {stocks.map((stock, index) => (
+              <TableRow key={index}>
+                <TableCell>{stock.name}</TableCell>
+                <TableCell>{stock.dividend}</TableCell>
+                <TableCell>{stock.date}</TableCell>
+                <TableCell>
+                  <Badge variant={stock.status === "배당완료" ? "default" : "outline"}>
+                    {stock.status}
+                  </Badge>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
