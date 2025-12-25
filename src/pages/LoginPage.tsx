@@ -19,7 +19,6 @@ export default function LoginPage({onLoginSuccess}: LoginPageProps) {
     const adminUser = {email: "test@test.com", password:"1111"};
 
     if (email == adminUser.email && password == adminUser.password) {
-      alert("로그인 성공");
       // 여기에서 메인 대시보드로 이동하는 로직 추가
       onLoginSuccess();
     } else {
