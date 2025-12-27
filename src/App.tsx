@@ -46,6 +46,11 @@ function App() {
     setCurrentView("list"); // 추가 후 목록으로 이동
   };
 
+  const deleteStock = (index: number) => {
+    const updatedStocks = stocks.filter((_, i) => i !== index);
+    setStocks(updatedStocks);
+    localStorage.setItem("my-stocks", JSON.stringify(updatedStocks));
+  };
 
   if (!isLoggedIn) {
     return <LoginPage onLoginSuccess={() => handleLoginSuccess()} />;
@@ -57,7 +62,8 @@ function App() {
         <DashboardPage 
           stocks={stocks}  
           onAddClick={() => setCurrentView("input")} 
-          onLogout={handleLogout} />
+          onLogout={handleLogout} 
+          onDeleteStock={deleteStock} />
       ) : (
         <DividendInputPage 
           onSave={addStock}
