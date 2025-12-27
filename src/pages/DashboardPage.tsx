@@ -14,13 +14,16 @@ const myStocks = [
 interface DashboardProps {
   stocks: StockData[];
   onAddClick: () => void;
+  onLogout: () => void;
 }
 
-export default function DashboardPage({ stocks, onAddClick }: DashboardProps) {
+export default function DashboardPage({ stocks, onAddClick, onLogout }: DashboardProps) {
   return (
     <div className="p-8 bg-slate-50 min-h-screen">
       <div className="max-w-5xl mx-auto space-y-6">
         <h1 className="text-3xl font-bold text-slate-900">내 배당금 대시보드</h1>
+        <div className="flex gab-2"><Button variant="outline" onClick={onLogout}>로그아웃</Button>
+        </div>
         {/* 배당금 입력 화면으로 이동하는 버튼 */}
           <Button onClick={onAddClick} className="flex gap-2">
             <PlusCircle size={18} />
@@ -74,9 +77,8 @@ export default function DashboardPage({ stocks, onAddClick }: DashboardProps) {
           <TableHeader>
             <TableRow>
               <TableHead>종목명</TableHead>
-              <TableHead>티커</TableHead>
-              <TableHead>수량</TableHead>
-              <TableHead>배당률</TableHead>
+              <TableHead>배당금 수령일</TableHead>
+              <TableHead>배당금</TableHead>
               <TableHead>상태</TableHead>
             </TableRow>
           </TableHeader>
@@ -84,8 +86,8 @@ export default function DashboardPage({ stocks, onAddClick }: DashboardProps) {
             {stocks.map((stock, index) => (
               <TableRow key={index}>
                 <TableCell>{stock.name}</TableCell>
-                <TableCell>{stock.dividend}</TableCell>
                 <TableCell>{stock.date}</TableCell>
+                <TableCell>{stock.dividend}</TableCell>
                 <TableCell>
                   <Badge variant={stock.status === "배당완료" ? "default" : "outline"}>
                     {stock.status}
