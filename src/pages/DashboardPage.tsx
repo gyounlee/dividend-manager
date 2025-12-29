@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, MoreHorizontal, Trash2 } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Trash2, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { type StockData } from "@/types/stock";
 import {
@@ -40,6 +40,7 @@ interface DashboardProps {
   onAddClick: () => void;
   onLogout: () => void;
   onDeleteStock: (index: number) => void;
+  onEdit: (index: number) => void;
 }
 
 export default function DashboardPage({
@@ -47,6 +48,7 @@ export default function DashboardPage({
   onAddClick,
   onLogout,
   onDeleteStock,
+  onEdit,
 }: DashboardProps) {
   return (
     <div className="p-8 bg-slate-50 min-h-screen">
@@ -133,6 +135,13 @@ export default function DashboardPage({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="bg-white">
+                          <DropdownMenuItem
+                            onClick={() => onEdit(index)}
+                            className="cursor-pointer"
+                          >
+                            <Pencil className="mr-2 h-4 w-4" />
+                            <span>수정하기</span>
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => onDeleteStock(index)}
                             className="text-red-600 focus:text-red-600 cursor-pointer"
