@@ -25,6 +25,13 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 const STOCKS = [
@@ -50,6 +57,9 @@ export default function DividendInputPage({
     name: initialData?.name || "",
     dividend: initialData?.dividend || "",
     date: initialData?.date || "",
+    quantity: initialData?.quantity || "",
+    accountType: initialData?.accountType || "TFSA",
+    accountOwner: initialData?.accountOwner || "",
   });
 
   const [open, setOpen] = useState(false);
@@ -124,6 +134,18 @@ export default function DividendInputPage({
             </Popover>
           </div>
           <div className="grid gap-2">
+            <Label htmlFor="quantity">주식 수량</Label>
+            <Input
+              id="quantity"
+              type="number"
+              value={formData.quantity}
+              onChange={(e) =>
+                setFormData({ ...formData, quantity: e.target.value })
+              }
+              placeholder="0"
+            />
+          </div>
+          <div className="grid gap-2">
             <Label htmlFor="amount">배당금액</Label>
             <Input
               value={formData.dividend}
@@ -133,6 +155,49 @@ export default function DividendInputPage({
               placeholder="0"
             />
           </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            {/* 계좌 소유자 */}
+            <div className="grid gap-2">
+              <Label htmlFor="accountOwner">계좌 소유자</Label>
+              <Select
+                value={formData.accountOwner}
+                onValueChange={(value: string) =>
+                  setFormData({ ...formData, accountOwner: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="선택" />
+                </SelectTrigger>
+                <SelectContent className="w-auto p-0 bg-white">
+                  <SelectItem value="GYOUN">GYOUN</SelectItem>
+                  <SelectItem value="SUNYOUNG">SUNYOUNG</SelectItem>
+                  <SelectItem value="JENNIE">JENNIE</SelectItem>
+                  <SelectItem value="OTHER">OTHER</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {/* 계좌 종류 선택 */}
+            <div className="grid gap-2">
+              <Label>계좌 종류</Label>
+              <Select
+                value={formData.accountType}
+                onValueChange={(value: string) =>
+                  setFormData({ ...formData, accountType: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="선택" />
+                </SelectTrigger>
+                <SelectContent className="w-auto p-0 bg-white">
+                  <SelectItem value="TFSA">TFSA</SelectItem>
+                  <SelectItem value="RRSP">RRSP</SelectItem>
+                  <SelectItem value="ETC">OTHER</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <div className="grid gap-2 flex flex-col">
             <Label>배당 수령일</Label>
             <Popover>

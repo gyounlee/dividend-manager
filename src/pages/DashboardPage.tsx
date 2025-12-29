@@ -9,7 +9,6 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, MoreHorizontal, Trash2, Pencil } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { type StockData } from "@/types/stock";
 import {
   DropdownMenu,
@@ -101,10 +100,12 @@ export default function DashboardPage({
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>계좌(소유자)</TableHead>
+                  <TableHead>계좌종류</TableHead>
                   <TableHead>종목명</TableHead>
+                  <TableHead>수량</TableHead>
                   <TableHead>배당금 수령일</TableHead>
                   <TableHead>배당금</TableHead>
-                  <TableHead>상태</TableHead>
                   <TableHead className="w-[50px]"></TableHead>{" "}
                   {/* [추가] 작업 열 */}
                 </TableRow>
@@ -112,19 +113,13 @@ export default function DashboardPage({
               <TableBody>
                 {stocks.map((stock, index) => (
                   <TableRow key={index}>
+                    <TableCell>{stock.accountOwner}</TableCell>
+                    <TableCell>{stock.accountType}</TableCell>
                     <TableCell>{stock.name}</TableCell>
+                    <TableCell>{stock.quantity}</TableCell>
                     <TableCell>{stock.date}</TableCell>
                     <TableCell className="font-mono text-right">
                       {formatCurrency(stock.dividend)}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          stock.status === "배당완료" ? "default" : "outline"
-                        }
-                      >
-                        {stock.status}
-                      </Badge>
                     </TableCell>
                     <TableCell>
                       {/* [추가] 삭제 버튼을 포함한 드롭다운 메뉴 */}
