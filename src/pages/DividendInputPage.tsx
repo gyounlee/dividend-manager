@@ -11,9 +11,6 @@ import {
 import { ArrowLeft, CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
 import { type StockData } from "@/types/stock";
-
-import { format } from "date-fns";
-import { ko } from "date-fns/locale";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -40,15 +37,21 @@ const STOCKS = [
 interface InputPageProps {
   onSave: (stock: StockData) => void;
   onBack: () => void;
+  initialData?: StockData; // 편집 시 기존 데이터 전달용
 }
 
-export default function DividendInputPage({ onSave, onBack }: InputPageProps) {
+export default function DividendInputPage({
+  onSave,
+  onBack,
+  initialData,
+}: InputPageProps) {
   // 입력 필드 상태 관리
   const [formData, setFormData] = useState({
-    name: "",
-    dividend: "",
-    date: "",
+    name: initialData?.name || "",
+    dividend: initialData?.dividend || "",
+    date: initialData?.date || "",
   });
+
   const [open, setOpen] = useState(false);
 
   const handleSubmit = () => {
@@ -66,7 +69,10 @@ export default function DividendInputPage({ onSave, onBack }: InputPageProps) {
           <Button variant="ghost" size="icon" onClick={onBack}>
             <ArrowLeft size={20} />
           </Button>
-          <CardTitle>배당금 정보 입력</CardTitle>
+          <CardTitle>
+            {" "}
+            {initialData ? "배당금 정보 수정" : "배당금 정보 입력"}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-2">
@@ -140,7 +146,7 @@ export default function DividendInputPage({ onSave, onBack }: InputPageProps) {
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {formData.date ? (
-                    format(new Date(formData.date), "PPP", { locale: ko })
+                    formData.date
                   ) : (
                     <span>날짜를 선택하세요</span>
                   )}
