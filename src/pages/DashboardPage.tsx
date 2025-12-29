@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -8,7 +9,14 @@ import {
 } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, MoreHorizontal, Trash2, Pencil } from "lucide-react";
+import {
+  Filter,
+  PlusCircle,
+  MoreHorizontal,
+  Trash2,
+  Pencil,
+  RotateCcw,
+} from "lucide-react";
 import { type StockData } from "@/types/stock";
 import {
   DropdownMenu,
@@ -16,12 +24,30 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
-/*const myStocks = [
-  { name: "삼성전자", ticker: "005930", amount: 10, dividend: "3.5%", status: "배당완료" },
-  { name: "애플", ticker: "AAPL", amount: 5, dividend: "0.6%", status: "배당예정" },
-  { name: "리얼티인컴", ticker: "O", amount: 20, dividend: "5.8%", status: "배당예정" },
-];*/
+interface DashboardProps {
+  stocks: StockData[];
+  onAddClick: () => void;
+  onLogout: () => void;
+  onDeleteStock: (index: number) => void;
+  onEdit: (index: number) => void;
+}
 
 const formatCurrency = (value: string | number) => {
   const amount = typeof value === "string" ? parseFloat(value) : value;
@@ -34,14 +60,6 @@ const formatCurrency = (value: string | number) => {
   }).format(amount);
 };
 
-interface DashboardProps {
-  stocks: StockData[];
-  onAddClick: () => void;
-  onLogout: () => void;
-  onDeleteStock: (index: number) => void;
-  onEdit: (index: number) => void;
-}
-
 export default function DashboardPage({
   stocks,
   onAddClick,
@@ -49,6 +67,57 @@ export default function DashboardPage({
   onDeleteStock,
   onEdit,
 }: DashboardProps) {
+  // 1. 필터 상태 관리
+  const [filter, setFilter] = useState({
+    accountType: "all",
+    accountOwner: "all",
+    stockName: "all",
+    year: "all",
+    month: "all",
+  });
+
+  // 2. 필터링 로직 (useMemo로 성능 최적화)
+  const filteredStocks = useMemo(() => {
+    return stocks.filter((stock) => {
+      const stockDate = new Date(stock.date);
+      const stockYear = stockDate.getFullYear().toString();
+      const stockMonth = (stockDate.getMonth() + 1).toString();
+
+      return (
+        (filter.accountType === "all" ||
+          stock.accountType === filter.accountType) &&
+        (filter.accountOwner === "all" ||
+          stock.accountOwner === filter.accountOwner) &&
+        (filter.stockName === "all" || stock.name === filter.stockName) &&
+        (filter.year === "all" || stockYear === filter.year) &&
+        (filter.month === "all" || stockMonth === filter.month)
+      );
+    });
+  }, [stocks, filter]);
+
+  // 3. 필터 목록 추출 (현재 데이터에 있는 값들만 중복 제거해서 추출)
+  const owners = Array.from(new Set(stocks.map((s) => s.accountOwner)));
+  const stockNames = Array.from(new Set(stocks.map((s) => s.name)));
+  const years = Array.from(
+    new Set(stocks.map((s) => new Date(s.date).getFullYear().toString()))
+  );
+
+  // 필터링된 목록의 배당금 합계 계산
+  const totalFilteredDividend = filteredStocks.reduce((sum, stock) => {
+    // 숫자가 아닌 값이 들어올 경우를 대비해 안전하게 파싱
+    const amount = parseFloat(stock.dividend) || 0;
+    return sum + amount;
+  }, 0);
+
+  // 필터링된 목록의 총 건수
+  const totalCount = filteredStocks.length;
+
+  // 필터링된 목록의 총 주식 수량 합계 (선택 사항)
+  const totalQuantity = filteredStocks.reduce((sum, stock) => {
+    const qty = parseFloat(stock.quantity) || 0;
+    return sum + qty;
+  }, 0);
+
   return (
     <div className="p-8 bg-slate-50 min-h-screen">
       <div className="max-w-5xl mx-auto space-y-6">
@@ -65,33 +134,182 @@ export default function DashboardPage({
           <PlusCircle size={18} />
           배당금 입력
         </Button>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">총 자산</CardTitle>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <Card className="bg-blue-50 border-blue-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-blue-600">
+                {Object.values(filter).some((v) => v !== "all")
+                  ? "필터링된 배당 합계"
+                  : "전체 배당 합계"}
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">₩12,450,000</p>
+              <p className="text-3xl font-bold text-blue-900">
+                {formatCurrency(totalFilteredDividend)}
+              </p>
             </CardContent>
           </Card>
+
           <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">연간 배당금</CardTitle>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-slate-500">
+                해당 내역 수
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold text-green-600">₩450,000</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">보유 종목수</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">3개</p>
+              <p className="text-3xl font-bold text-slate-900">
+                {totalCount}{" "}
+                <span className="text-lg font-normal text-slate-500">건</span>
+              </p>
             </CardContent>
           </Card>
         </div>
+        <div>
+          {/* 필터 버튼 및 패널 */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="flex gap-2">
+                <Filter size={18} /> 필터
+                {Object.values(filter).some((v) => v !== "all") && (
+                  <Badge variant="secondary" className="ml-1">
+                    Active
+                  </Badge>
+                )}
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="bg-white">
+              <SheetHeader>
+                <SheetTitle>데이터 필터링</SheetTitle>
+              </SheetHeader>
+              <div className="space-y-4 mt-6">
+                {/* 계좌 종류 필터 */}
+                <div className="space-y-2">
+                  <Label>계좌 종류</Label>
+                  <Select
+                    value={filter.accountType}
+                    onValueChange={(v) =>
+                      setFilter({ ...filter, accountType: v })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectItem value="all">전체</SelectItem>
+                      <SelectItem value="TFSA">TFSA</SelectItem>
+                      <SelectItem value="RRSP">RRSP</SelectItem>
+                      <SelectItem value="ETC">OTHER</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
+                {/* 계좌 소유주 필터 */}
+                <div className="space-y-2">
+                  <Label>계좌 소유주</Label>
+                  <Select
+                    value={filter.accountOwner}
+                    onValueChange={(v) =>
+                      setFilter({ ...filter, accountOwner: v })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectItem value="all">전체</SelectItem>
+                      {owners.map((o) => (
+                        <SelectItem key={o} value={o}>
+                          {o}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {/* 종목명 필터 [추가] */}
+                <div className="space-y-2">
+                  <Label>종목명</Label>
+                  <Select
+                    value={filter.stockName}
+                    onValueChange={(v) =>
+                      setFilter({ ...filter, stockName: v })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="종목 선택" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectItem value="all">전체</SelectItem>
+                      {stockNames.map((name) => (
+                        <SelectItem key={name} value={name}>
+                          {name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {/* 년도 필터 */}
+                <div className="space-y-2">
+                  <Label>연도</Label>
+                  <Select
+                    value={filter.year}
+                    onValueChange={(v) => setFilter({ ...filter, year: v })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectItem value="all">전체</SelectItem>
+                      {years.map((y) => (
+                        <SelectItem key={y} value={y}>
+                          {y}년
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>월</Label>
+                  <Select
+                    value={filter.month}
+                    onValueChange={(v) => setFilter({ ...filter, month: v })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="월 선택" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectItem value="all">전체</SelectItem>
+                      {/* 1월부터 12월까지 생성 */}
+                      {Array.from({ length: 12 }, (_, i) =>
+                        (i + 1).toString()
+                      ).map((m) => (
+                        <SelectItem key={m} value={m}>
+                          {m}월
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Button
+                  variant="ghost"
+                  className="w-full mt-4 flex gap-2 text-slate-500"
+                  onClick={() =>
+                    setFilter({
+                      accountType: "all",
+                      accountOwner: "all",
+                      stockName: "all",
+                      year: "all",
+                      month: "all",
+                    })
+                  }
+                >
+                  <RotateCcw size={16} /> 필터 초기화
+                </Button>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
         <Card>
           <CardHeader>
             <CardTitle>주식 배당금 목록</CardTitle>
@@ -111,7 +329,7 @@ export default function DashboardPage({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {stocks.map((stock, index) => (
+                {filteredStocks.map((stock, index) => (
                   <TableRow key={index}>
                     <TableCell>{stock.accountOwner}</TableCell>
                     <TableCell>{stock.accountType}</TableCell>
