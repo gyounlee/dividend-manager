@@ -8,28 +8,45 @@ import { supabase } from "./lib/supabase";
 import { RotateCcw } from "lucide-react";
 
 function App() {
-  // 로그인 여부를 관리하는 상태
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
-    return localStorage.getItem("isLoggedIn") === "true";
-  });
-
-  // 로그인 성공 시 호출: 상태를 바꾸고 로컬스토리지에도 기록합니다.
-  const handleLoginSuccess = () => {
-    localStorage.setItem("isLoggedIn", "true");
-    setIsLoggedIn(true);
-  };
-
-  // 로그아웃 시 호출: 상태를 바꾸고 로컬스토리지 기록을 지웁니다.
-  const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    setIsLoggedIn(false);
-  };
-
   // Current View
   const [currentView, setCurrentView] = useState<"list" | "input">("list");
+  // 로그인 여부를 관리하는 상태
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [loading, setLoading] = useState(true); // 로딩 상태 추가
   const [stocks, setStocks] = useState<StockData[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
+
+  useEffect(() => {
+    // 1. 현재 로그인된 세션이 있는지 확인
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      setIsLoggedIn(!!session);
+      setLoading(false);
+    };
+
+    checkSession();
+
+    // 2. 로그인/로그아웃 상태 변화를 실시간으로 감지
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setIsLoggedIn(false);
+  };
+
+  // 로그인 성공 시 호출: 상태를 바꿈
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+  };
 
   // 데이터 불러오기
   useEffect(() => {
