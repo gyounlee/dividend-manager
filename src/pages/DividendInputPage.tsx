@@ -34,27 +34,18 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
-const STOCKS = [
-  { label: "JPEQ.TO", value: "JPEQ.TO" },
-  { label: "XEI.TO", value: "XEI.TO" },
-  { label: "DFN.TO", value: "DFN.TO" },
-  { label: "VFV.TO", value: "VFV.TO" },
-  { label: "FSZ.TO", value: "FSZ.TO" },
-  { label: "EXE.TO", value: "EXE.TO" },
-  { label: "YDY.TO", value: "YDY.TO" },
-  { label: "REI.UN.TO", value: "REI.UN.TO" },
-];
-
 interface InputPageProps {
   onSave: (stock: StockData) => void;
   onBack: () => void;
-  initialData?: StockData; // 편집 시 기존 데이터 전달용
+  initialData?: StockData;
+  stockOptions: { label: string; value: string }[];
 }
 
 export default function DividendInputPage({
   onSave,
   onBack,
   initialData,
+  stockOptions,
 }: InputPageProps) {
   // 입력 필드 상태 관리
   const [formData, setFormData] = useState({
@@ -99,8 +90,9 @@ export default function DividendInputPage({
                   className="w-full justify-between"
                 >
                   {formData.name
-                    ? STOCKS.find((stock) => stock.label === formData.name)
-                        ?.label
+                    ? stockOptions.find(
+                        (stock) => stock.label === formData.name
+                      )?.label
                     : "종목을 검색하거나 선택하세요..."}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -111,7 +103,7 @@ export default function DividendInputPage({
                   <CommandList>
                     <CommandEmpty>검색 결과가 없습니다.</CommandEmpty>
                     <CommandGroup>
-                      {STOCKS.map((stock) => (
+                      {stockOptions.map((stock) => (
                         <CommandItem
                           key={stock.value}
                           value={stock.label}

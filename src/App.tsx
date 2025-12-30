@@ -15,6 +15,9 @@ function App() {
   const [loading, setLoading] = useState(true); // 로딩 상태 추가
   const [stocks, setStocks] = useState<StockData[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [stockOptions, setStockOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
 
   useEffect(() => {
     // 1. 현재 로그인된 세션이 있는지 확인
@@ -50,24 +53,26 @@ function App() {
 
   // 데이터 불러오기
   useEffect(() => {
-    const fetchStocks = async () => {
+    const fetchInitialData = async () => {
       try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from("dividends")
-          .select("*")
-          .order("date", { ascending: false });
+        // 배당 데이터와 종목 리스트를 동시에 가져오기
+        const [dividendsRes, stocksRes] = await Promise.all([
+          supabase
+            .from("dividends")
+            .select("*")
+            .order("date", { ascending: false }),
+          supabase.from("stock_list").select("label, value").order("label"),
+        ]);
 
-        if (error) throw error;
-        setStocks(data || []);
+        if (dividendsRes.data) setStocks(dividendsRes.data);
+        if (stocksRes.data) setStockOptions(stocksRes.data);
       } catch (error) {
-        console.error("Error fetching stocks:", error);
-      } finally {
-        setLoading(false);
+        console.error(error);
       }
     };
-    fetchStocks();
-  }, []);
+
+    if (isLoggedIn) fetchInitialData();
+  }, [isLoggedIn]);
 
   // 데이타 추가 함수
   const addStock = async (newStock: Omit<StockData, "id">) => {
@@ -164,6 +169,7 @@ function App() {
               ? stocks.find((s) => s.id === editingId)
               : undefined
           } // 기존 데이터 전달
+          stockOptions={stockOptions}
         />
       )}
     </div>
