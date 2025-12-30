@@ -64,13 +64,13 @@ export default function DividendInputPage({
 
   const [open, setOpen] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.name || !formData.dividend) {
-      alert("종목명과 티커를 입력해주세요.");
+      alert("종목명과 배당금을 입력해주세요.");
       return;
     }
     // 부모의 addStock 함수 실행
-    onSave(formData);
+    await onSave(formData as StockData);
   };
   return (
     <div className="p-8 bg-slate-50 min-h-screen flex justify-center">

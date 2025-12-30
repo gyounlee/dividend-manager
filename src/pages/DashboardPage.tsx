@@ -113,10 +113,10 @@ export default function DashboardPage({
   const totalCount = filteredStocks.length;
 
   // 필터링된 목록의 총 주식 수량 합계 (선택 사항)
-  const totalQuantity = filteredStocks.reduce((sum, stock) => {
+  /* const totalQuantity = filteredStocks.reduce((sum, stock) => {
     const qty = parseFloat(stock.quantity) || 0;
     return sum + qty;
-  }, 0);
+  }, 0);*/
 
   return (
     <div className="p-8 bg-slate-50 min-h-screen">
@@ -349,14 +349,14 @@ export default function DashboardPage({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="bg-white">
                           <DropdownMenuItem
-                            onClick={() => onEdit(index)}
+                            onClick={() => onEdit(stock.id!)}
                             className="cursor-pointer"
                           >
                             <Pencil className="mr-2 h-4 w-4" />
                             <span>수정하기</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => onDeleteStock(index)}
+                            onClick={() => onDeleteStock(stock.id!)}
                             className="text-red-600 focus:text-red-600 cursor-pointer"
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
