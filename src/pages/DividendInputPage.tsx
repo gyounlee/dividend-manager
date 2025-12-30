@@ -39,6 +39,10 @@ const STOCKS = [
   { label: "XEI.TO", value: "XEI.TO" },
   { label: "DFN.TO", value: "DFN.TO" },
   { label: "VFV.TO", value: "VFV.TO" },
+  { label: "FSZ.TO", value: "FSZ.TO" },
+  { label: "EXE.TO", value: "EXE.TO" },
+  { label: "YDY.TO", value: "YDY.TO" },
+  { label: "REI.UN.TO", value: "REI.UN.TO" },
 ];
 
 interface InputPageProps {
