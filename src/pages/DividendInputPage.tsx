@@ -188,6 +188,7 @@ export default function DividendInputPage({
                 <SelectContent className="w-auto p-0 bg-white">
                   <SelectItem value="TFSA">TFSA</SelectItem>
                   <SelectItem value="RRSP">RRSP</SelectItem>
+                  <SelectItem value="FHSA">FHSA</SelectItem>
                   <SelectItem value="ETC">OTHER</SelectItem>
                 </SelectContent>
               </Select>
