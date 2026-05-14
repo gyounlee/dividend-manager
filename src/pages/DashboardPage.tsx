@@ -83,11 +83,16 @@ export default function DashboardPage({
       const stockYear = stockDate.getFullYear().toString();
       const stockMonth = (stockDate.getMonth() + 1).toString();
 
+      const matchOwner =
+        filter.accountOwner === "all" ||
+        (Array.isArray(filter.accountOwner)
+          ? filter.accountOwner.includes(stock.accountOwner)
+          : stock.accountOwner === filter.accountOwner);
+
       return (
         (filter.accountType === "all" ||
           stock.accountType === filter.accountType) &&
-        (filter.accountOwner === "all" ||
-          stock.accountOwner === filter.accountOwner) &&
+        matchOwner &&
         (filter.stockName === "all" || stock.name === filter.stockName) &&
         (filter.year === "all" || stockYear === filter.year) &&
         (filter.month === "all" || stockMonth === filter.month)
@@ -99,7 +104,7 @@ export default function DashboardPage({
   const owners = Array.from(new Set(stocks.map((s) => s.accountOwner)));
   const stockNames = Array.from(new Set(stocks.map((s) => s.name)));
   const years = Array.from(
-    new Set(stocks.map((s) => new Date(s.date).getFullYear().toString()))
+    new Set(stocks.map((s) => new Date(s.date).getFullYear().toString())),
   );
 
   // 필터링된 목록의 배당금 합계 계산
@@ -163,6 +168,27 @@ export default function DashboardPage({
               </p>
             </CardContent>
           </Card>
+        </div>
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm font-medium mr-2">빠른 필터:</span>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setFilter({ ...filter, accountOwner: "GYOUN" })}
+            >
+              교운
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() =>
+                setFilter({ ...filter, accountOwner: ["GYOUN", "SUNYOUNG"] })
+              }
+            >
+              교운/선영
+            </Button>
+          </div>
         </div>
         <div>
           {/* 필터 버튼 및 패널 */}
@@ -281,7 +307,7 @@ export default function DashboardPage({
                       <SelectItem value="all">전체</SelectItem>
                       {/* 1월부터 12월까지 생성 */}
                       {Array.from({ length: 12 }, (_, i) =>
-                        (i + 1).toString()
+                        (i + 1).toString(),
                       ).map((m) => (
                         <SelectItem key={m} value={m}>
                           {m}월
