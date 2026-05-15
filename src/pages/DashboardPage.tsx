@@ -49,6 +49,15 @@ interface DashboardProps {
   onEdit: (index: number) => void;
 }
 
+interface FilterState {
+  accountType: string;
+  // 기존: accountOwner: string;
+  accountOwner: string | string[]; // 문자열 또는 문자열 배열을 허용하도록 수정
+  stockName: string;
+  year: string;
+  month: string;
+}
+
 const formatCurrency = (value: string | number) => {
   const amount = typeof value === "string" ? parseFloat(value) : value;
   if (isNaN(amount)) return "$0.00";
@@ -68,7 +77,7 @@ export default function DashboardPage({
   onEdit,
 }: DashboardProps) {
   // 1. 필터 상태 관리
-  const [filter, setFilter] = useState({
+  const [filter, setFilter] = useState<FilterState>({
     accountType: "all",
     accountOwner: "all",
     stockName: "all",
@@ -86,8 +95,8 @@ export default function DashboardPage({
       const matchOwner =
         filter.accountOwner === "all" ||
         (Array.isArray(filter.accountOwner)
-          ? filter.accountOwner.includes(stock.accountOwner)
-          : stock.accountOwner === filter.accountOwner);
+          ? filter.accountOwner.includes(stock.accountOwner ?? "")
+          : (stock.accountOwner ?? "") === filter.accountOwner);
 
       return (
         (filter.accountType === "all" ||
@@ -101,7 +110,14 @@ export default function DashboardPage({
   }, [stocks, filter]);
 
   // 3. 필터 목록 추출 (현재 데이터에 있는 값들만 중복 제거해서 추출)
-  const owners = Array.from(new Set(stocks.map((s) => s.accountOwner)));
+  //const owners = Array.from(new Set(stocks.map((s) => s.accountOwner)));
+  const owners = useMemo(() => {
+    const allOwners = stocks.flatMap((s) =>
+      Array.isArray(s.accountOwner) ? s.accountOwner : [s.accountOwner],
+    );
+    // null이나 undefined, "all" 같은 값을 제외하고 중복 제거
+    return Array.from(new Set(allOwners.filter(Boolean) as string[]));
+  }, [stocks]);
   const stockNames = Array.from(new Set(stocks.map((s) => s.name)));
   const years = Array.from(
     new Set(stocks.map((s) => new Date(s.date).getFullYear().toString())),
@@ -233,7 +249,11 @@ export default function DashboardPage({
                 <div className="space-y-2">
                   <Label>계좌 소유주</Label>
                   <Select
-                    value={filter.accountOwner}
+                    value={
+                      Array.isArray(filter.accountOwner)
+                        ? "all"
+                        : filter.accountOwner
+                    }
                     onValueChange={(v) =>
                       setFilter({ ...filter, accountOwner: v })
                     }
