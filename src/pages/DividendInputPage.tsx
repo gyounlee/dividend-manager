@@ -51,10 +51,10 @@ export default function DividendInputPage({
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
     dividend: initialData?.dividend || "",
-    date: initialData?.date || "",
-    quantity: initialData?.quantity || "",
+    date: initialData?.date || new Date().toISOString().split("T")[0],
+    quantity: initialData?.quantity || "0",
     accountType: initialData?.accountType || "TFSA",
-    accountOwner: initialData?.accountOwner || "",
+    accountOwner: initialData?.accountOwner || "GYOUN",
   });
 
   const [open, setOpen] = useState(false);
@@ -91,7 +91,7 @@ export default function DividendInputPage({
                 >
                   {formData.name
                     ? stockOptions.find(
-                        (stock) => stock.label === formData.name
+                        (stock) => stock.label === formData.name,
                       )?.label
                     : "종목을 검색하거나 선택하세요..."}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -117,7 +117,7 @@ export default function DividendInputPage({
                               "mr-2 h-4 w-4",
                               formData.name === stock.label
                                 ? "opacity-100"
-                                : "opacity-0"
+                                : "opacity-0",
                             )}
                           />
                           {stock.label} ({stock.value})
@@ -203,7 +203,7 @@ export default function DividendInputPage({
                   variant={"outline"}
                   className={cn(
                     "w-full justify-start text-left font-normal",
-                    !formData.date && "text-muted-foreground"
+                    !formData.date && "text-muted-foreground",
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
